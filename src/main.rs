@@ -36,6 +36,12 @@ fn tokenize(file_contents: String) {
     for token in file_contents.split(" ") {
         for ch in token.chars() {
             match ch {
+                ';' => println!("SEMICOLON {ch} null"),
+                '-' => println!("MINUS {ch} null"),
+                '+' => println!("PLUS {ch} null"),
+                ',' => println!("COMMA {ch} null"),
+                '.' => println!("DOT {ch} null"),
+                '*' => println!("STAR {ch} null"),
                 '{' => println!("LEFT_BRACE {ch} null"),
                 '}' => println!("RIGHT_BRACE {ch} null"),
                 '(' => println!("LEFT_PAREN {ch} null"),
