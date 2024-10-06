@@ -1,5 +1,6 @@
 use std::env;
 use std::fs;
+use std::process::exit;
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
@@ -33,24 +34,59 @@ fn main() {
 }
 
 fn tokenize(file_contents: String) {
-    for token in file_contents.split(" ") {
+    let mut exit_code = 0;
+    for (line, token) in file_contents.split(" ").enumerate() {
         for ch in token.chars() {
             match ch {
-                ';' => println!("SEMICOLON {ch} null"),
-                '-' => println!("MINUS {ch} null"),
-                '+' => println!("PLUS {ch} null"),
-                ',' => println!("COMMA {ch} null"),
-                '.' => println!("DOT {ch} null"),
-                '*' => println!("STAR {ch} null"),
-                '{' => println!("LEFT_BRACE {ch} null"),
-                '}' => println!("RIGHT_BRACE {ch} null"),
-                '(' => println!("LEFT_PAREN {ch} null"),
-                ')' => println!("RIGHT_PAREN {ch} null"),
-                _ => continue,
+                ';' => {
+                    println!("SEMICOLON {ch} null");
+                    continue;
+                }
+                '-' => {
+                    println!("MINUS {ch} null");
+                    continue;
+                }
+                '+' => {
+                    println!("PLUS {ch} null");
+                    continue;
+                }
+                ',' => {
+                    println!("COMMA {ch} null");
+                    continue;
+                }
+                '.' => {
+                    println!("DOT {ch} null");
+                    continue;
+                }
+                '*' => {
+                    println!("STAR {ch} null");
+                    continue;
+                }
+                '{' => {
+                    println!("LEFT_BRACE {ch} null");
+                    continue;
+                }
+                '}' => {
+                    println!("RIGHT_BRACE {ch} null");
+                    continue;
+                }
+                '(' => {
+                    println!("LEFT_PAREN {ch} null");
+                    continue;
+                }
+                ')' => {
+                    println!("RIGHT_PAREN {ch} null");
+                    continue;
+                }
+                _ => {
+                    eprintln!("[line {}] Error: Unexpected character: {ch}", line + 1);
+                    exit_code = 65
+                }
             }
         }
+        println!("EOF  null");
     }
-    println!("EOF  null");
+    exit(exit_code);
 }
 
 #[derive()]
