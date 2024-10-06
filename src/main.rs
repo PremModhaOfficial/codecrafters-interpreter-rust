@@ -36,8 +36,8 @@ fn tokenize(file_contents: String) {
     for token in file_contents.split(" ") {
         for ch in token.chars() {
             match ch {
-                '(' => println!("{} {} {}", "LEFT_PAREN", ch, "null"),
-                ')' => println!("{} {} {}", "RIGHT_PAREN", ch, "null"),
+                '(' => println!("LEFT_PAREN {ch} null"),
+                ')' => println!("RIGHT_PAREN {ch} null"),
                 _ => continue,
             }
         }
