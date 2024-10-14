@@ -76,6 +76,16 @@ fn tokenize(file_contents: String) {
                 '}' => lox.log(format!("RIGHT_BRACE {ch} null")),
                 '(' => lox.log(format!("LEFT_PAREN {ch} null")),
                 ')' => lox.log(format!("RIGHT_PAREN {ch} null")),
+                '!' => {
+                    if let Some(after_bang) = chariter.peek() {
+                        if *after_bang == '=' {
+                            lox.log("BANG_EQUAL != null".to_string());
+                            chariter.next();
+                        } else {
+                            lox.log(format!("BANG {ch} null"));
+                        }
+                    }
+                }
                 '=' => {
                     if let Some(after_equal) = chariter.peek() {
                         match after_equal {
