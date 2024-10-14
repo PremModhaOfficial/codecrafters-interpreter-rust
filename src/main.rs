@@ -1,3 +1,4 @@
+use std::char;
 use std::env;
 use std::fs;
 use std::process::exit;
@@ -88,15 +89,17 @@ fn tokenize(file_contents: String) {
                 }
                 '=' => {
                     if let Some(after_equal) = chariter.peek() {
-                        match after_equal {
-                            '=' => {
-                                lox.log("EQUAL_EQUAL == null".to_string());
-                                chariter.next();
-                            }
-                            _ => lox.log("EQUAL = null".to_string()),
+                        let (did_match, log) = make_next("EQUAL", ch, *after_equal);
+                        if did_match {
+                            chariter.next();
                         }
-                    } else {
-                        lox.log("EQUAL = null".to_string());
+                        lox.log(log);
+                        // if *after_equal == '=' {
+                        //     lox.log("EQUAL_EQUAL == null".to_string());
+                        //     chariter.next();
+                        // } else {
+                        //     lox.log("EQUAL = null".to_string());
+                        // }
                     }
                 }
                 _ => {
@@ -110,6 +113,16 @@ fn tokenize(file_contents: String) {
         lox.print_to_stdout();
     }
     exit(exit_code);
+}
+
+fn make_next(arg: &str, this: char, after_symbol: char) -> (bool, String) {
+    println!("{arg}");
+    if after_symbol == '=' {
+        let str = format!("{arg}_EQUAL {this}{after_symbol} null");
+
+        return (true, str.to_string());
+    }
+    return (false, "".to_string());
 }
 
 #[derive()]
