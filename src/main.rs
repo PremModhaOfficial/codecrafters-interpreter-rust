@@ -87,6 +87,28 @@ fn tokenize(file_contents: String) {
                         }
                     }
                 }
+                '>' => {
+                    if let Some(after_less) = chariter.peek() {
+                        let (did_match, log) = make_next("GREATER", ch, *after_less);
+                        if did_match {
+                            chariter.next();
+                        }
+                        lox.log(log);
+                    } else {
+                        lox.log("GREATER > null".to_string());
+                    }
+                }
+                '<' => {
+                    if let Some(after_less) = chariter.peek() {
+                        let (did_match, log) = make_next("LESS", ch, *after_less);
+                        if did_match {
+                            chariter.next();
+                        }
+                        lox.log(log);
+                    } else {
+                        lox.log("LESS < null".to_string());
+                    }
+                }
                 '=' => {
                     if let Some(after_equal) = chariter.peek() {
                         let (did_match, log) = make_next("EQUAL", ch, *after_equal);
@@ -94,12 +116,8 @@ fn tokenize(file_contents: String) {
                             chariter.next();
                         }
                         lox.log(log);
-                        // if *after_equal == '=' {
-                        //     lox.log("EQUAL_EQUAL == null".to_string());
-                        //     chariter.next();
-                        // } else {
-                        //     lox.log("EQUAL = null".to_string());
-                        // }
+                    } else {
+                        lox.log("EQUAL = null".to_string());
                     }
                 }
                 _ => {
@@ -116,13 +134,13 @@ fn tokenize(file_contents: String) {
 }
 
 fn make_next(arg: &str, this: char, after_symbol: char) -> (bool, String) {
-    println!("{arg}");
+    // println!("{arg}");
     if after_symbol == '=' {
         let str = format!("{arg}_EQUAL {this}{after_symbol} null");
 
         return (true, str.to_string());
     }
-    return (false, "".to_string());
+    (false, format!("{arg} {this} null"))
 }
 
 #[derive()]
