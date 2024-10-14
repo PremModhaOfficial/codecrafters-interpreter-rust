@@ -1,6 +1,32 @@
 use std::env;
 use std::fs;
 use std::process::exit;
+
+#[derive(Debug)]
+struct Lox {
+    had_error: bool,
+    output: Vec<String>,
+}
+
+impl Lox {
+    fn new() -> Self {
+        Self {
+            had_error: false,
+            output: Vec::new(),
+        }
+    }
+    fn log(&mut self, str: String) {
+        self.output.push(str);
+    }
+
+    fn print_to_stdout(&self) {
+        for line in self.output.clone() {
+            println!("{line}");
+        }
+        exit(if !self.had_error { 0 } else { 65 })
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
@@ -35,56 +61,43 @@ fn main() {
 
 fn tokenize(file_contents: String) {
     let mut exit_code = 0;
+    let mut lox = Lox::new();
     for (line, token) in file_contents.split(" ").enumerate() {
-        for ch in token.chars() {
+        let mut chariter = token.chars().peekable();
+        while let Some(ch) = chariter.next() {
             match ch {
-                ';' => {
-                    println!("SEMICOLON {ch} null");
-                    continue;
-                }
-                '-' => {
-                    println!("MINUS {ch} null");
-                    continue;
-                }
-                '+' => {
-                    println!("PLUS {ch} null");
-                    continue;
-                }
-                ',' => {
-                    println!("COMMA {ch} null");
-                    continue;
-                }
-                '.' => {
-                    println!("DOT {ch} null");
-                    continue;
-                }
-                '*' => {
-                    println!("STAR {ch} null");
-                    continue;
-                }
-                '{' => {
-                    println!("LEFT_BRACE {ch} null");
-                    continue;
-                }
-                '}' => {
-                    println!("RIGHT_BRACE {ch} null");
-                    continue;
-                }
-                '(' => {
-                    println!("LEFT_PAREN {ch} null");
-                    continue;
-                }
-                ')' => {
-                    println!("RIGHT_PAREN {ch} null");
-                    continue;
+                ';' => lox.log(format!("SEMICOLON {ch} null")),
+                '-' => lox.log(format!("MINUS {ch} null")),
+                '+' => lox.log(format!("PLUS {ch} null")),
+                ',' => lox.log(format!("COMMA {ch} null")),
+                '.' => lox.log(format!("DOT {ch} null")),
+                '*' => lox.log(format!("STAR {ch} null")),
+                '{' => lox.log(format!("LEFT_BRACE {ch} null")),
+                '}' => lox.log(format!("RIGHT_BRACE {ch} null")),
+                '(' => lox.log(format!("LEFT_PAREN {ch} null")),
+                ')' => lox.log(format!("RIGHT_PAREN {ch} null")),
+                '=' => {
+                    if let Some(after_equal) = chariter.peek() {
+                        match after_equal {
+                            '=' => {
+                                lox.log("EQUAL_EQUAL == null".to_string());
+                                chariter.next();
+                            }
+                            _ => lox.log("EQUAL = null".to_string()),
+                        }
+                    } else {
+                        lox.log("EQUAL = null".to_string());
+                    }
                 }
                 _ => {
                     eprintln!("[line {}] Error: Unexpected character: {ch}", line + 1);
+                    lox.had_error = true;
                     exit_code = 65
                 }
             }
         }
-        println!("EOF  null");
+        lox.log("EOF  null".to_string());
+        lox.print_to_stdout();
     }
     exit(exit_code);
 }
