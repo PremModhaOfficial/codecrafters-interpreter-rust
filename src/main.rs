@@ -1,5 +1,6 @@
 use std::char;
 use std::env;
+use std::fmt;
 use std::fs;
 use std::process::exit;
 
@@ -21,8 +22,8 @@ impl Lox {
     }
 
     fn print_to_stdout(&self) {
-        for line in self.output.clone() {
-            println!("{line}");
+        for tkn in self.output.clone() {
+            println!("{}", tkn);
         }
         exit(if !self.had_error { 0 } else { 65 })
     }
@@ -67,6 +68,19 @@ fn tokenize(file_contents: String) {
         let mut chariter = token.chars().peekable();
         while let Some(ch) = chariter.next() {
             match ch {
+                '/' => {
+                    if let Some(after_slash) = chariter.peek() {
+                        if *after_slash == '/' {
+                            for ch in chariter.by_ref() {
+                                if ch == '\n' {
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        lox.log(format!("SLASH {ch} null"));
+                    }
+                }
                 ';' => lox.log(format!("SEMICOLON {ch} null")),
                 '-' => lox.log(format!("MINUS {ch} null")),
                 '+' => lox.log(format!("PLUS {ch} null")),
@@ -133,81 +147,52 @@ fn tokenize(file_contents: String) {
     exit(exit_code);
 }
 
-fn make_next(arg: &str, this: char, after_symbol: char) -> (bool, String) {
+fn make_next(current_str: &str, current_char: char, next_symbol: char) -> (bool, String) {
     // println!("{arg}");
-    if after_symbol == '=' {
-        let str = format!("{arg}_EQUAL {this}{after_symbol} null");
+    if next_symbol == '=' {
+        let str = format!("{current_str}_EQUAL {current_char}{next_symbol} null");
 
         return (true, str.to_string());
     }
-    (false, format!("{arg} {this} null"))
+    (false, format!("{current_str} {current_char} null"))
 }
 
-#[derive()]
-struct Token {
-    token_type: TokenType,
-    lexeme: String,
-    litral: String,
-    line: i32,
+#[derive(Debug, PartialEq, Clone)]
+pub enum TokenType {
+    // ... (same as before, but without the associated values)
 }
 
-impl Token {
-    fn new(token_type: TokenType, lexeme: String, litral: String, line: i32) -> Self {
-        Self {
-            token_type,
-            lexeme,
-            litral,
-            line,
-        }
+#[derive(Clone)]
+pub struct Token {
+    pub token_type: TokenType,
+    pub lexeme: String,
+    pub literal: Option<Literal>,
+    pub line: usize,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum Literal {
+    String(String),
+    Number(f64),
+    Bool(bool),
+}
+
+impl fmt::Debug for Token {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{:?} {} {}",
+            self.token_type,
+            self.lexeme,
+            if let Some(value) = &self.literal {
+                match value {
+                    Literal::String(s) => format!("\"{}\"", s),
+                    Literal::Number(n) => n.to_string(),
+                    Literal::Bool(b) => b.to_string(),
+                }
+            } else {
+                "null".to_string()
+            }
+        )
     }
-}
-#[derive(std::fmt::Debug)]
-enum TokenType {
-    // Single-character tokens.
-    LeftParen,
-    RightParen,
-    LeftBrace,
-    RightBrace,
-    Comma,
-    Dot,
-    Minus,
-    Plus,
-    Semicolon,
-    Slash,
-    Star,
-
-    // one or two character tokens.
-    Bang,
-    BangEqual,
-    Equal,
-    EqualEqual,
-    Greater,
-    GreaterEqual,
-    Less,
-    LessEqual,
-
-    // literals.
-    Identifier,
-    String,
-    Number,
-
-    // keywords.
-    And,
-    Class,
-    Else,
-    False,
-    Fun,
-    For,
-    If,
-    Nil,
-    Or,
-    Print,
-    Return,
-    Super,
-    This,
-    True,
-    Var,
-    While,
-
-    Eof,
 }
