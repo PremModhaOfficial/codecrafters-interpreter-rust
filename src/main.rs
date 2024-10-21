@@ -149,8 +149,23 @@ fn tokenize(file_contents: String) {
                     }
                 }
                 ' ' | '\r' | '\t' | '\n' => {}
-                n => lox.log("Number {n} {n}".to_string()),
-                _ => {
+                n => {
+                    if n.is_numeric() {
+                        let mut accumilate = n.to_string();
+                        while let Some(next) = chariter.peek() {
+                            if next.is_numeric() || *next == '.' {
+                                accumilate.push(*next);
+                                chariter.next();
+                            } else {
+                                break;
+                            }
+                        }
+                        let current_number: f64 = accumilate.parse().unwrap();
+
+                        lox.log(format!("NUMBER {accumilate} {:#?}", current_number));
+                        continue;
+                    }
+
                     eprintln!("[line {}] Error: Unexpected character: {ch}", line + 1);
                     lox.had_error = true;
                     exit_code = 65
