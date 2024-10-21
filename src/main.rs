@@ -1,8 +1,4 @@
-use std::char;
-use std::env;
-use std::fmt;
-use std::fs;
-use std::process::exit;
+use std::{env, fmt, fs, process::exit};
 
 #[derive(Debug)]
 struct Lox {
@@ -64,7 +60,7 @@ fn main() {
 fn tokenize(file_contents: String) {
     let mut exit_code = 0;
     let mut lox = Lox::new();
-    for (line, token) in file_contents.split(" ").enumerate() {
+    for (line, token) in file_contents.lines().enumerate() {
         let mut chariter = token.chars().peekable();
         while let Some(ch) = chariter.next() {
             match ch {
@@ -134,6 +130,7 @@ fn tokenize(file_contents: String) {
                         lox.log("EQUAL = null".to_string());
                     }
                 }
+                ' ' | '\r' | '\t' | '\n' => {}
                 _ => {
                     eprintln!("[line {}] Error: Unexpected character: {ch}", line + 1);
                     lox.had_error = true;
@@ -141,9 +138,9 @@ fn tokenize(file_contents: String) {
                 }
             }
         }
-        lox.log("EOF  null".to_string());
-        lox.print_to_stdout();
     }
+    lox.log("EOF  null".to_string());
+    lox.print_to_stdout();
     exit(exit_code);
 }
 
