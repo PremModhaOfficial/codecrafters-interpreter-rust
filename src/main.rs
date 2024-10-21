@@ -64,6 +64,24 @@ fn tokenize(file_contents: String) {
         let mut chariter = token.chars().peekable();
         while let Some(ch) = chariter.next() {
             match ch {
+                '\"' => {
+                    let mut string = String::new();
+                    let mut is_terminated = false;
+                    for ch in chariter.by_ref() {
+                        if ch == '\"' {
+                            is_terminated = true;
+                            break;
+                        }
+                        string.push(ch);
+                    }
+                    if !is_terminated {
+                        eprintln!("[line {}] Error: Unterminated string.", line + 1);
+                        lox.had_error = true;
+                        exit_code = 65;
+                    } else {
+                        lox.log(format!("STRING \"{string}\" {string}"));
+                    }
+                }
                 '/' => {
                     if let Some(after_slash) = chariter.peek() {
                         if *after_slash == '/' {
