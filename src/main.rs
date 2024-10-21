@@ -149,6 +149,7 @@ fn tokenize(file_contents: String) {
                     }
                 }
                 ' ' | '\r' | '\t' | '\n' => {}
+                n => lox.log("Number {n} {n}".to_string()),
                 _ => {
                     eprintln!("[line {}] Error: Unexpected character: {ch}", line + 1);
                     lox.had_error = true;
